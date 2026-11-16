@@ -161,19 +161,16 @@ def create_scenes():
 def make_voice():
     script=("Dari Sabang sampai Merauke, Indonesia menjaga setiap inci kedaulatan. "
             "TNI hadir di darat, laut, dan udara. "
-            "Dengan sekitar tiga ratus tiga puluh delapan aset angkatan laut menurut Global Firepower dua ribu dua puluh enam, Indonesia berdiri kokoh di tengah kepulauan Nusantara. "
-            "Lebih dari empat ratus ribu personel aktif, menurut estimasi Global Firepower dua ribu dua puluh enam, siap menjaga kedaulatan bangsa. "
+            "Tiga matra bergerak bersama, menjaga wilayah darat, perairan, dan ruang udara Nusantara. "
+            "Dengan lebih dari empat ratus ribu personel aktif, menurut estimasi Global Firepower dua ribu dua puluh enam, "
+            "Indonesia terus memperkuat kesiapsiagaan pertahanan. "
             "Indonesia kuat. TNI siap. Nusantara tegak.")
-    espeak=shutil.which("espeak-ng") or shutil.which("espeak")
-    if not espeak:
-        raise RuntimeError("eSpeak NG tidak ditemukan. Install espeak-ng terlebih dahulu.")
+    model=ROOT/"models"/"id_ID-news_tts-medium.onnx"
+    piper=shutil.which("piper")
+    if not piper or not model.exists():
+        raise RuntimeError("Piper TTS atau model suara Bahasa Indonesia tidak tersedia.")
     wav=TMP/"narration.wav"
-    # Voice id is preferred; fallback to Indonesian-capable default if unavailable.
-    cmd=[espeak,"-v","id","-s","178","-p","34","-a","165","-w",str(wav),script]
-    try: run(cmd)
-    except subprocess.CalledProcessError:
-        print("Peringatan: voice 'id' tidak tersedia; memakai voice default eSpeak.",file=sys.stderr)
-        run([espeak,"-s","178","-p","34","-a","165","-w",str(wav),script])
+    subprocess.run([piper,"--model",str(model),"--output_file",str(wav)],input=script,text=True,check=True)
     return wav
 
 def make_subtitles():
@@ -198,6 +195,83 @@ def make_subtitles():
             f.write(f"Dialogue: 0,{ts(a)},{ts(b)},Default,,0,0,0,,{t}\n")
     return ass
 
+def render_animated_scene(img_path, index, duration, output):
+    """Render actual moving graphic elements; no Ken Burns camera-only motion."""
+    base=Image.open(img_path).convert("RGB").resize((540,960),Image.Resampling.LANCZOS)
+    frames=duration*FPS
+    cmd=["ffmpeg","-y","-f","rawvideo","-pix_fmt","rgb24","-s","540x960","-r",str(FPS),
+         "-i","-","-an","-c:v","libx264","-preset","ultrafast","-crf","22",
+         "-pix_fmt","yuv420p",str(output)]
+    proc=subprocess.Popen(cmd,stdin=subprocess.PIPE)
+    try:
+        for n in range(frames):
+            t=n/FPS
+            frame=base.copy()
+            d=ImageDraw.Draw(frame,"RGBA")
+            if index==0:
+                # A moving route pulse crosses the archipelago.
+                pts=[(65,410),(155,365),(245,430),(330,390),(430,520)]
+                d.line(pts,fill=(255,205,105,150),width=3)
+                q=(t/duration)%1
+                seg=min(int(q*(len(pts)-1)),len(pts)-2)
+                u=q*(len(pts)-1)-seg
+                x=pts[seg][0]*(1-u)+pts[seg+1][0]*u
+                y=pts[seg][1]*(1-u)+pts[seg+1][1]*u
+                r=9+int(5*(0.5+0.5*math.sin(t*7)))
+                d.ellipse((x-r-8,y-r-8,x+r+8,y+r+8),fill=(255,205,105,35))
+                d.ellipse((x-r,y-r,x+r,y+r),fill=(255,225,145,255))
+            elif index==1:
+                # Jet flies across frame; ship glides over animated water.
+                x=-100+int((t/duration)*760)
+                y=285+int(18*math.sin(t*2.4))
+                d.polygon([(x,y-35),(x+90,y),(x,y+12),(x-55,y+6)],fill=(225,235,238,245))
+                d.polygon([(x-35,y+5),(x-110,y+22),(x-45,y-3)],fill=(255,180,95,180))
+                sx=80+int((t/duration)*390)
+                sy=715+int(8*math.sin(t*3))
+                d.polygon([(sx-70,sy),(sx+70,sy),(sx+48,sy+20),(sx-50,sy+20)],fill=(220,230,232,245))
+                d.rectangle((sx-18,sy-28,sx+20,sy),fill=(245,245,235,245))
+                for k in range(4):
+                    yy=sy+24+k*10
+                    d.arc((sx-95-k*10,yy-8,sx+95+k*10,yy+14),0,180,fill=(80,200,235,180),width=2)
+            elif index==2:
+                # Patrol vessel travels; wake and wave bands move independently.
+                x=-120+int((t/duration)*790)
+                y=650+int(10*math.sin(t*2.7))
+                d.polygon([(x-90,y),(x+95,y),(x+65,y+28),(x-65,y+28)],fill=(210,225,230,250),outline=(255,220,145,255))
+                d.rectangle((x-25,y-40,x+35,y),fill=(235,240,235,255))
+                d.rectangle((x-8,y-58,x+12,y-40),fill=(245,245,235,255))
+                for k in range(5):
+                    yy=y+34+k*12
+                    off=int((t*65+k*35)%110)
+                    d.arc((x-145-off,yy-8,x+125-off,yy+20),0,180,fill=(75,190,225,160),width=3)
+            elif index==3:
+                # Radar sweep rotates and target blips pulse.
+                cx,cy=270,360
+                radius=145
+                ang=t*2.5
+                ex=cx+int(radius*math.cos(ang)); ey=cy+int(radius*math.sin(ang))
+                d.ellipse((cx-radius,cy-radius,cx+radius,cy+radius),outline=(95,210,225,110),width=2)
+                d.ellipse((cx-radius//2,cy-radius//2,cx+radius//2,cy+radius//2),outline=(95,210,225,80),width=2)
+                d.line((cx,cy,ex,ey),fill=(255,205,105,245),width=5)
+                for tx,ty,phase in [(350,300,0.0),(190,390,1.7),(300,445,3.1)]:
+                    pulse=5+int(5*(0.5+0.5*math.sin(t*5+phase)))
+                    d.ellipse((tx-pulse,ty-pulse,tx+pulse,ty+pulse),fill=(255,100,85,230))
+            else:
+                # Animated light beams and moving birds around the closing frame.
+                for k in range(4):
+                    x=int((t*95+k*180)%700)-80
+                    d.line((x,150,x+100,600),fill=(255,205,115,28),width=13)
+                for k in range(3):
+                    x=int((t*80+k*210)%650)-50
+                    y=360+k*55+int(9*math.sin(t*4+k))
+                    d.arc((x,y,x+35,y+20),190,350,fill=(235,240,245,230),width=3)
+                    d.arc((x+25,y,x+60,y+20),190,350,fill=(235,240,245,230),width=3)
+            proc.stdin.write(frame.tobytes())
+    finally:
+        proc.stdin.close()
+    if proc.wait()!=0:
+        raise RuntimeError("Gagal merender animasi scene")
+
 def main():
     scenes=create_scenes()
     voice=make_voice()
@@ -206,13 +280,7 @@ def main():
     durations=[4,6,7,7,6]
     for i,(img,dur) in enumerate(zip(scenes,durations)):
         seg=TMP/f"segment_{i}.mp4"
-        frames=dur*FPS
-        vf=(f"scale=1200:2134:force_original_aspect_ratio=increase,"
-            f"crop=1200:2134,zoompan=z='min(zoom+0.0007,1.10)':"
-            f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={W}x{H}:fps={FPS},"
-            f"setsar=1,format=yuv420p")
-        run(["ffmpeg","-y","-loop","1","-i",str(img),"-vf",vf,"-t",str(dur),
-             "-r",str(FPS),"-an","-c:v","libx264","-preset","ultrafast","-crf","21",str(seg)])
+        render_animated_scene(img,i,dur,seg)
         segments.append(seg)
     concat=TMP/"concat.txt"
     concat.write_text("".join(f"file '{p.as_posix()}'\n" for p in segments),encoding="utf-8")
