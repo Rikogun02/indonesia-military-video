@@ -185,9 +185,9 @@ def make_subtitles():
     lines=[
       (0,4,"Dari Sabang sampai Merauke,\nIndonesia menjaga setiap inci kedaulatan."),
       (4,10,"TNI hadir di darat, laut, dan udara."),
-      (10,17,"Sekitar 338 aset angkatan laut menurut\NGlobal Firepower 2026."),
-      (17,24,"Lebih dari 400 ribu personel aktif*\Nsiap menjaga kedaulatan bangsa."),
-      (24,30,"Indonesia kuat. TNI siap.\NNusantara tegak.")
+      (10,17,"Sekitar 338 aset angkatan laut menurut\\NGlobal Firepower 2026."),
+      (17,24,"Lebih dari 400 ribu personel aktif*\\Nsiap menjaga kedaulatan bangsa."),
+      (24,30,"Indonesia kuat. TNI siap.\\NNusantara tegak.")
     ]
     def ts(s):
         h=int(s//3600); m=int((s%3600)//60); sec=s%60
