@@ -28,7 +28,7 @@ jobs:
 
       - name: Install system tools
         run: |
-          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
           ffmpeg -version | head -n 1
 
       - name: Set up Python
@@ -39,6 +39,15 @@ jobs:
 
       - name: Install Python dependencies
         run: python -m pip install --upgrade pip && pip install -r requirements.txt
+
+      - name: Install neural Indonesian voice engine
+        run: python -m pip install piper-tts
+
+      - name: Download Indonesian neural voice
+        run: |
+          mkdir -p models
+          curl -L --fail --retry 3 -o models/id_ID-news_tts-medium.onnx https://huggingface.co/rhasspy/piper-voices/resolve/main/id/id_ID/news_tts/medium/id_ID-news_tts-medium.onnx
+          curl -L --fail --retry 3 -o models/id_ID-news_tts-medium.onnx.json https://huggingface.co/rhasspy/piper-voices/resolve/main/id/id_ID/news_tts/medium/id_ID-news_tts-medium.onnx.json
 
       - name: Prepare output folder
         run: mkdir -p output
