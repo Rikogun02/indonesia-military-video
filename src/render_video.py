@@ -134,25 +134,21 @@ def create_scenes():
         elif i==1:
             soldier(d,260,1050,0.9); soldier(d,540,1050,1.0); soldier(d,820,1050,0.9)
             ship(d,540,1430,0.85); jet(d,540,570,0.65)
-            centered(d,(W//2,1640),"ANGKATAN DARAT  •  LAUT  •  UDARA",font(27,True),(245,245,245,255))
         elif i==2:
             island_shapes(d,yoff=-30,scale=1.0); ship(d,540,1320,1.0)
             for x in [160,920]:
                 d.ellipse((x-55,800-55,x+55,800+55),outline=(255,210,120,180),width=5)
                 d.line((x,800,x+120,690),fill=(255,210,120,180),width=4)
-            centered(d,(W//2,1660),"ESTIMASI GLOBAL FIREPOWER 2026",font(27,True),(235,195,120,255))
         elif i==3:
             soldier(d,280,1120,1.05); soldier(d,540,1120,1.05); soldier(d,800,1120,1.05)
             radar(d,540,650)
             d.ellipse((200,430,880,1110),outline=(75,185,215,80),width=4)
-            centered(d,(W//2,1540),"DISIPLIN  •  LATIHAN  •  KESIAPSIAGAAN",font(27,True),(245,245,245,255))
         else:
             monas(d,540,1040)
             # Generic heraldic bird silhouette, not official insignia.
             d.ellipse((420,570,660,790),fill=(210,180,105,255))
             d.polygon([(440,650),(250,560),(370,730),(540,700),(710,730),(830,560),(640,650)],fill=(210,180,105,255))
             d.polygon([(520,770),(560,770),(540,850)],fill=(210,180,105,255))
-            centered(d,(W//2,1510),"MERAH PUTIH MENJAGA NUSANTARA",font(30,True),(255,255,255,255))
         # vignette
         mask=Image.new("L",(W,H),0); md=ImageDraw.Draw(mask)
         md.ellipse((-250,-100,W+250,H+150),fill=180)
