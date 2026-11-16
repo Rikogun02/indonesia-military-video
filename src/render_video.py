@@ -176,11 +176,11 @@ def make_voice():
 def make_subtitles():
     # ASS subtitles: readable, moderate size, bottom safe-zone.
     lines=[
-      (0,4,"Dari Sabang sampai Merauke,\\NIndonesia menjaga setiap inci kedaulatan."),
-      (4,10,"TNI hadir di darat, laut, dan udara."),
-      (10,17,"Sekitar 338 aset angkatan laut menurut\\NGlobal Firepower 2026."),
-      (17,24,"Lebih dari 400 ribu personel aktif*\\Nsiap menjaga kedaulatan bangsa."),
-      (24,30,"Indonesia kuat. TNI siap.\\NNusantara tegak.")
+      (0,5,"Dari Sabang sampai Merauke,\\NIndonesia menjaga setiap inci kedaulatan."),
+      (5,10,"TNI hadir di darat, laut, dan udara."),
+      (10,17,"Tiga matra bergerak bersama,\\Nmenjaga wilayah Nusantara."),
+      (17,25,"Lebih dari 400 ribu personel aktif*\\Nsiap menjaga kedaulatan bangsa."),
+      (25,30,"Indonesia kuat. TNI siap.\\NNusantara tegak.")
     ]
     def ts(s):
         h=int(s//3600); m=int((s%3600)//60); sec=s%60
