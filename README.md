@@ -1,6 +1,6 @@
 # Kekuatan Militer Indonesia: Siap Menjaga Nusantara
 
-Proyek open-source untuk merender video pendek sinematik 30 detik tentang TNI dalam format vertikal 9:16 (1080x1920, 30 fps). Seluruh visual utama dibuat secara generatif dengan Python/Pillow; audio narasi menggunakan eSpeak NG lokal; musik latar dibuat secara sintetis dengan FFmpeg. Tidak memerlukan API key, akun layanan AI berbayar, atau aset stok berbayar.
+Proyek open-source untuk merender video pendek sinematik 30 detik tentang TNI dalam format vertikal 9:16 (1080x1920, 30 fps). Seluruh visual utama dibuat secara generatif dengan Python/Pillow; audio narasi menggunakan Piper neural TTS Bahasa Indonesia; musik latar dibuat secara sintetis dengan FFmpeg. Elemen jet, kapal, radar, rute, dan cahaya dianimasikan per-frame, bukan hanya zoom kamera. Tidak memerlukan API key, akun layanan AI berbayar, atau aset stok berbayar.
 
 ## Tujuan
 Mengenalkan tiga matra TNI, kesiapsiagaan, modernisasi pertahanan, dan pentingnya menjaga wilayah kepulauan Indonesia melalui video edukasi singkat.
@@ -9,7 +9,7 @@ Mengenalkan tiga matra TNI, kesiapsiagaan, modernisasi pertahanan, dan pentingny
 - Python 3.11
 - Pillow untuk ilustrasi generatif
 - FFmpeg/ffprobe untuk rendering, audio, dan pemeriksaan durasi
-- eSpeak NG untuk text-to-speech lokal (voice Indonesia bila tersedia)
+- Piper TTS + model neural Bahasa Indonesia `id_ID-news_tts-medium`
 - GitHub Actions untuk render otomatis
 - Font DejaVu Sans dari paket fonts-dejavu-core
 
@@ -37,7 +37,7 @@ sudo apt-get update
 sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
 ```
 
-Tidak ada API key yang diminta. Jika voice Indonesia tidak tersedia pada distribusi eSpeak NG tertentu, renderer mencoba voice fallback dan mencatat peringatan.
+Tidak ada API key yang diminta. Workflow mengunduh model suara Piper Bahasa Indonesia dari Hugging Face saat render. Model tersedia di https://huggingface.co/rhasspy/piper-voices/tree/main/id/id_ID/news_tts/medium. Periksa kartu model dan lisensi dataset sumber sebelum penggunaan komersial.
 
 ## Data dan ketepatan fakta
 - Global Firepower, *2026 Indonesia Military Strength*: https://www.globalfirepower.com/country-military-strength-detail.php?country_id=indonesia
@@ -49,7 +49,7 @@ Tidak ada API key yang diminta. Jika voice Indonesia tidak tersedia pada distrib
 Naskah menghindari klaim "kekuatan maritim terbesar di Asia Tenggara" karena perbandingan tersebut tidak dapat disimpulkan hanya dari angka total aset GFP. Kalimat narasi diganti dengan penyebutan jumlah aset yang diberi atribusi sumber. Visual kapal, pesawat, personel, radar, peta, dan monumen adalah ilustrasi generatif, bukan dokumentasi unit atau operasi nyata.
 
 ## Sumber dan lisensi aset
-Tidak ada foto atau footage pihak ketiga yang dibundel. Ilustrasi dan musik latar dibuat oleh kode proyek saat render. Font DejaVu Sans berasal dari paket fonts-dejavu-core dan didistribusikan di bawah lisensi Bitstream Vera/DejaVu; lihat https://dejavu-fonts.github.io/License.html. eSpeak NG tersedia di https://github.com/espeak-ng/espeak-ng (GPL-3.0). FFmpeg tersedia di https://ffmpeg.org/ (lisensi bergantung pada build dan konfigurasi).
+Tidak ada foto atau footage pihak ketiga yang dibundel. Ilustrasi dan musik latar dibuat oleh kode proyek saat render. Font DejaVu Sans berasal dari paket fonts-dejavu-core dan didistribusikan di bawah lisensi Bitstream Vera/DejaVu; lihat https://dejavu-fonts.github.io/License.html. Piper TTS tersedia di https://github.com/rhasspy/piper (MIT). Model suara Indonesia tersedia di https://huggingface.co/rhasspy/piper-voices/tree/main/id/id_ID/news_tts/medium; kartu model mencantumkan dataset sumber dengan lisensi CC BY-NC-SA 4.0, sehingga penggunaan komersial perlu pemeriksaan izin lebih lanjut. FFmpeg tersedia di https://ffmpeg.org/ (lisensi bergantung pada build dan konfigurasi).
 
 ## Lisensi proyek
 Kode proyek: MIT License. Lisensi ini tidak mengubah lisensi perangkat lunak sistem yang dipasang saat workflow berjalan.
